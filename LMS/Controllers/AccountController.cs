@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,6 +18,7 @@ using LMS.Models.AccountViewModels;
 using LMS.Models.LMSModels;
 using LMS.Services;
 using Microsoft.EntityFrameworkCore;
+using Remotion.Linq.Parsing.Structure.IntermediateModel;
 
 namespace LMS.Controllers
 {
@@ -513,20 +515,22 @@ namespace LMS.Controllers
             using (db)
             {
                 //Query for the highest UID so far
-                var idQuery =
-                    (from a in db.Administrators
-                        select a.UId).Union(from s in db.Students
-                        select s.UId).Union(from p in db.Professors
-                        select p.UId).ToList();
+                var adminQuery = from a in db.Administrators orderby a.UId descending select a.UId;
+                var studentQuery = from s in db.Students orderby s.UId descending select s.UId;
+                var professorQuery = from p in db.Professors orderby p.UId descending select p.UId;
 
-                var parsedIds = idQuery.Select(long.Parse).ToList();
+                List<long> greatestUids = new List<long>();
+                
+                if(adminQuery.Any())
+                    greatestUids.Add(long.Parse(adminQuery.ToList()[0].Substring(1)));
+                if(studentQuery.Any())
+                    greatestUids.Add(long.Parse(studentQuery.ToList()[0].Substring(1)));
+                if(professorQuery.Any())
+                    greatestUids.Add(long.Parse(professorQuery.ToList()[0].Substring(1)));
 
-                parsedIds.Sort();
-                parsedIds.Reverse();
-
-                if (parsedIds.Count > 0)
+                if (greatestUids.Count > 0)
                 {
-                    uID += (parsedIds[0] + 1).ToString();
+                    uID += (greatestUids.Max() + 1).ToString();
                 }
                 else
                 {
