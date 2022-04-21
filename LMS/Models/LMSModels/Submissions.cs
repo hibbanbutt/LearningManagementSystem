@@ -5,14 +5,13 @@ namespace LMS.Models.LMSModels
 {
     public partial class Submissions
     {
-        public int? Score { get; set; }
-        public DateTime? SubmitTime { get; set; }
-        public string Contents { get; set; }
-        public int AssignId { get; set; }
-        public string UId { get; set; }
-        public int SubmitId { get; set; }
+        public uint Assignment { get; set; }
+        public string Student { get; set; }
+        public uint Score { get; set; }
+        public string SubmissionContents { get; set; }
+        public DateTime Time { get; set; }
 
-        public virtual Assignments Assign { get; set; }
-        public virtual Students U { get; set; }
+        public virtual Assignments AssignmentNavigation { get; set; }
+        public virtual Students StudentNavigation { get; set; }
     }
 }

@@ -44,17 +44,19 @@ namespace LMS.Models.LMSModels
 
                 entity.Property(e => e.UId)
                     .HasColumnName("uID")
-                    .HasColumnType("varchar(8)");
+                    .HasColumnType("char(8)");
 
                 entity.Property(e => e.Dob)
                     .HasColumnName("DOB")
                     .HasColumnType("date");
 
                 entity.Property(e => e.FName)
+                    .IsRequired()
                     .HasColumnName("fName")
                     .HasColumnType("varchar(100)");
 
                 entity.Property(e => e.LName)
+                    .IsRequired()
                     .HasColumnName("lName")
                     .HasColumnType("varchar(100)");
             });
@@ -64,76 +66,54 @@ namespace LMS.Models.LMSModels
                 entity.HasKey(e => e.CategoryId)
                     .HasName("PRIMARY");
 
-                entity.HasIndex(e => e.ClassId)
-                    .HasName("classID");
+                entity.HasIndex(e => e.InClass)
+                    .HasName("AssignmentCategories_ibfk_1");
 
-                entity.HasIndex(e => new { e.Name, e.ClassId })
-                    .HasName("real_Key")
+                entity.HasIndex(e => new { e.Name, e.InClass })
+                    .HasName("Name")
                     .IsUnique();
 
-                entity.Property(e => e.CategoryId)
-                    .HasColumnName("categoryID")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.ClassId)
-                    .HasColumnName("classID")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
 
                 entity.Property(e => e.Name)
-                    .HasColumnName("name")
+                    .IsRequired()
                     .HasColumnType("varchar(100)");
 
-                entity.Property(e => e.Weight)
-                    .HasColumnName("weight")
-                    .HasColumnType("int(11)");
-
-                entity.HasOne(d => d.Class)
+                entity.HasOne(d => d.InClassNavigation)
                     .WithMany(p => p.AssignmentCategories)
-                    .HasForeignKey(d => d.ClassId)
+                    .HasForeignKey(d => d.InClass)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("AssignmentCategories_ibfk_1");
             });
 
             modelBuilder.Entity<Assignments>(entity =>
             {
-                entity.HasKey(e => e.AssignId)
+                entity.HasKey(e => e.AssignmentId)
                     .HasName("PRIMARY");
 
-                entity.HasIndex(e => e.CategoryId)
-                    .HasName("categoryID");
+                entity.HasIndex(e => e.Category)
+                    .HasName("Assignments_ibfk_1");
 
-                entity.HasIndex(e => new { e.Name, e.CategoryId })
-                    .HasName("real_key_assign")
+                entity.HasIndex(e => new { e.Name, e.Category })
+                    .HasName("name_unique")
                     .IsUnique();
 
-                entity.Property(e => e.AssignId)
-                    .HasColumnName("assignID")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.CategoryId)
-                    .HasColumnName("categoryID")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.AssignmentId).HasColumnName("AssignmentID");
 
                 entity.Property(e => e.Contents)
-                    .HasColumnName("contents")
+                    .IsRequired()
                     .HasColumnType("varchar(8192)");
 
-                entity.Property(e => e.Due)
-                    .HasColumnName("due")
-                    .HasColumnType("datetime");
+                entity.Property(e => e.Due).HasColumnType("datetime");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasColumnName("name")
                     .HasColumnType("varchar(100)");
 
-                entity.Property(e => e.Points)
-                    .HasColumnName("points")
-                    .HasColumnType("int(11)");
-
-                entity.HasOne(d => d.Category)
+                entity.HasOne(d => d.CategoryNavigation)
                     .WithMany(p => p.Assignments)
-                    .HasForeignKey(d => d.CategoryId)
+                    .HasForeignKey(d => d.Category)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Assignments_ibfk_1");
             });
 
@@ -142,93 +122,70 @@ namespace LMS.Models.LMSModels
                 entity.HasKey(e => e.ClassId)
                     .HasName("PRIMARY");
 
-                entity.HasIndex(e => e.CourseId)
-                    .HasName("courseID");
+                entity.HasIndex(e => e.Listing)
+                    .HasName("Classes_ibfk_1");
 
-                entity.HasIndex(e => e.Teacher)
-                    .HasName("teacher");
+                entity.HasIndex(e => e.TaughtBy)
+                    .HasName("Taught");
 
-                entity.HasIndex(e => new { e.SemesterYear, e.SemesterSeason, e.CourseId })
-                    .HasName("key_class")
+                entity.HasIndex(e => new { e.Season, e.Year, e.Listing })
+                    .HasName("Season")
                     .IsUnique();
 
-                entity.Property(e => e.ClassId)
-                    .HasColumnName("classID")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.ClassId).HasColumnName("ClassID");
 
-                entity.Property(e => e.CourseId)
-                    .HasColumnName("courseID")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.EndTime)
-                    .HasColumnName("endTime")
-                    .HasColumnType("time");
+                entity.Property(e => e.EndTime).HasColumnType("time");
 
                 entity.Property(e => e.Location)
-                    .HasColumnName("location")
+                    .IsRequired()
                     .HasColumnType("varchar(100)");
 
-                entity.Property(e => e.SemesterSeason)
-                    .HasColumnName("semesterSeason")
-                    .HasColumnType("varchar(10)");
-
-                entity.Property(e => e.SemesterYear)
-                    .HasColumnName("semesterYear")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.StartTime)
-                    .HasColumnName("startTime")
-                    .HasColumnType("time");
-
-                entity.Property(e => e.Teacher)
+                entity.Property(e => e.Season)
                     .IsRequired()
-                    .HasColumnName("teacher")
-                    .HasColumnType("varchar(8)");
+                    .HasColumnType("varchar(6)");
 
-                entity.HasOne(d => d.Course)
-                    .WithMany(p => p.Classes)
-                    .HasForeignKey(d => d.CourseId)
-                    .HasConstraintName("Classes_ibfk_2");
+                entity.Property(e => e.StartTime).HasColumnType("time");
 
-                entity.HasOne(d => d.TeacherNavigation)
+                entity.Property(e => e.TaughtBy).HasColumnType("char(8)");
+
+                entity.HasOne(d => d.ListingNavigation)
                     .WithMany(p => p.Classes)
-                    .HasForeignKey(d => d.Teacher)
+                    .HasForeignKey(d => d.Listing)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Classes_ibfk_1");
+
+                entity.HasOne(d => d.TaughtByNavigation)
+                    .WithMany(p => p.Classes)
+                    .HasForeignKey(d => d.TaughtBy)
+                    .HasConstraintName("Taught");
             });
 
             modelBuilder.Entity<Courses>(entity =>
             {
-                entity.HasKey(e => e.CourseId)
+                entity.HasKey(e => e.CatalogId)
                     .HasName("PRIMARY");
 
-                entity.HasIndex(e => e.Subject)
-                    .HasName("subject");
+                entity.HasIndex(e => e.Department)
+                    .HasName("Courses_ibfk_1");
 
-                entity.HasIndex(e => new { e.Number, e.Subject })
-                    .HasName("real_key")
+                entity.HasIndex(e => new { e.Number, e.Department })
+                    .HasName("Number")
                     .IsUnique();
 
-                entity.Property(e => e.CourseId)
-                    .HasColumnName("courseID")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.CatalogId).HasColumnName("CatalogID");
 
-                entity.Property(e => e.Name)
-                    .HasColumnName("name")
-                    .HasColumnType("varchar(100)");
-
-                entity.Property(e => e.Number)
-                    .HasColumnName("number")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.Subject)
+                entity.Property(e => e.Department)
                     .IsRequired()
-                    .HasColumnName("subject")
                     .HasColumnType("varchar(4)");
 
-                entity.HasOne(d => d.SubjectNavigation)
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasColumnType("varchar(100)");
+
+                entity.HasOne(d => d.DepartmentNavigation)
                     .WithMany(p => p.Courses)
-                    .HasForeignKey(d => d.Subject)
+                    .HasForeignKey(d => d.Department)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Courses_ibfk_1");
             });
 
@@ -237,45 +194,38 @@ namespace LMS.Models.LMSModels
                 entity.HasKey(e => e.Subject)
                     .HasName("PRIMARY");
 
-                entity.Property(e => e.Subject)
-                    .HasColumnName("subject")
-                    .HasColumnType("varchar(4)");
+                entity.Property(e => e.Subject).HasColumnType("varchar(4)");
 
                 entity.Property(e => e.Name)
-                    .HasColumnName("name")
+                    .IsRequired()
                     .HasColumnType("varchar(100)");
             });
 
             modelBuilder.Entity<Enrolled>(entity =>
             {
-                entity.HasKey(e => new { e.ClassId, e.UId })
+                entity.HasKey(e => new { e.Student, e.Class })
                     .HasName("PRIMARY");
 
-                entity.HasIndex(e => e.UId)
-                    .HasName("Enrolled_ibfk_3");
+                entity.HasIndex(e => e.Class)
+                    .HasName("Enrolled_ibfk_2");
 
-                entity.Property(e => e.ClassId)
-                    .HasColumnName("classID")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.UId)
-                    .HasColumnName("uID")
-                    .HasColumnType("varchar(8)");
+                entity.Property(e => e.Student).HasColumnType("char(8)");
 
                 entity.Property(e => e.Grade)
-                    .HasColumnName("grade")
+                    .IsRequired()
                     .HasColumnType("varchar(2)");
 
-                entity.HasOne(d => d.Class)
+                entity.HasOne(d => d.ClassNavigation)
                     .WithMany(p => p.Enrolled)
-                    .HasForeignKey(d => d.ClassId)
+                    .HasForeignKey(d => d.Class)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Enrolled_ibfk_2");
 
-                entity.HasOne(d => d.U)
+                entity.HasOne(d => d.StudentNavigation)
                     .WithMany(p => p.Enrolled)
-                    .HasForeignKey(d => d.UId)
+                    .HasForeignKey(d => d.Student)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Enrolled_ibfk_3");
+                    .HasConstraintName("Enrolled_ibfk_1");
             });
 
             modelBuilder.Entity<Professors>(entity =>
@@ -284,32 +234,34 @@ namespace LMS.Models.LMSModels
                     .HasName("PRIMARY");
 
                 entity.HasIndex(e => e.WorksIn)
-                    .HasName("worksIn");
+                    .HasName("Professors_ibfk_1");
 
                 entity.Property(e => e.UId)
                     .HasColumnName("uID")
-                    .HasColumnType("varchar(8)");
+                    .HasColumnType("char(8)");
 
                 entity.Property(e => e.Dob)
                     .HasColumnName("DOB")
                     .HasColumnType("date");
 
                 entity.Property(e => e.FName)
+                    .IsRequired()
                     .HasColumnName("fName")
                     .HasColumnType("varchar(100)");
 
                 entity.Property(e => e.LName)
+                    .IsRequired()
                     .HasColumnName("lName")
                     .HasColumnType("varchar(100)");
 
                 entity.Property(e => e.WorksIn)
                     .IsRequired()
-                    .HasColumnName("worksIn")
                     .HasColumnType("varchar(4)");
 
                 entity.HasOne(d => d.WorksInNavigation)
                     .WithMany(p => p.Professors)
                     .HasForeignKey(d => d.WorksIn)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Professors_ibfk_1");
             });
 
@@ -319,80 +271,61 @@ namespace LMS.Models.LMSModels
                     .HasName("PRIMARY");
 
                 entity.HasIndex(e => e.Major)
-                    .HasName("major");
+                    .HasName("Students_ibfk_1");
 
                 entity.Property(e => e.UId)
                     .HasColumnName("uID")
-                    .HasColumnType("varchar(8)");
+                    .HasColumnType("char(8)");
 
                 entity.Property(e => e.Dob)
                     .HasColumnName("DOB")
                     .HasColumnType("date");
 
                 entity.Property(e => e.FName)
+                    .IsRequired()
                     .HasColumnName("fName")
                     .HasColumnType("varchar(100)");
 
                 entity.Property(e => e.LName)
+                    .IsRequired()
                     .HasColumnName("lName")
                     .HasColumnType("varchar(100)");
 
                 entity.Property(e => e.Major)
                     .IsRequired()
-                    .HasColumnName("major")
                     .HasColumnType("varchar(4)");
 
                 entity.HasOne(d => d.MajorNavigation)
                     .WithMany(p => p.Students)
                     .HasForeignKey(d => d.Major)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Students_ibfk_1");
             });
 
             modelBuilder.Entity<Submissions>(entity =>
             {
-                entity.HasKey(e => e.SubmitId)
+                entity.HasKey(e => new { e.Assignment, e.Student })
                     .HasName("PRIMARY");
 
-                entity.HasIndex(e => e.UId)
-                    .HasName("uID");
+                entity.HasIndex(e => e.Student)
+                    .HasName("Submissions_ibfk_2");
 
-                entity.HasIndex(e => new { e.AssignId, e.UId })
-                    .HasName("real_uniqueness_key")
-                    .IsUnique();
+                entity.Property(e => e.Student).HasColumnType("char(8)");
 
-                entity.Property(e => e.SubmitId)
-                    .HasColumnName("submitID")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.SubmissionContents).HasColumnType("varchar(8192)");
 
-                entity.Property(e => e.AssignId)
-                    .HasColumnName("assignID")
-                    .HasColumnType("int(11)");
+                entity.Property(e => e.Time).HasColumnType("datetime");
 
-                entity.Property(e => e.Contents)
-                    .HasColumnName("contents")
-                    .HasColumnType("varchar(8192)");
-
-                entity.Property(e => e.Score)
-                    .HasColumnName("score")
-                    .HasColumnType("int(11)");
-
-                entity.Property(e => e.SubmitTime)
-                    .HasColumnName("submitTime")
-                    .HasColumnType("datetime");
-
-                entity.Property(e => e.UId)
-                    .IsRequired()
-                    .HasColumnName("uID")
-                    .HasColumnType("varchar(8)");
-
-                entity.HasOne(d => d.Assign)
+                entity.HasOne(d => d.AssignmentNavigation)
                     .WithMany(p => p.Submissions)
-                    .HasForeignKey(d => d.AssignId)
+                    .HasForeignKey(d => d.Assignment)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Submissions_ibfk_1");
 
-                entity.HasOne(d => d.U)
+                entity.HasOne(d => d.StudentNavigation)
                     .WithMany(p => p.Submissions)
-                    .HasForeignKey(d => d.UId)
+                    .HasForeignKey(d => d.Student)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("Submissions_ibfk_2");
             });
         }

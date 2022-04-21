@@ -530,11 +530,11 @@ namespace LMS.Controllers
 
                 if (greatestUids.Count > 0)
                 {
-                    uID += (greatestUids.Max() + 1).ToString();
+                    uID += (greatestUids.Max() + 1).ToString("D7");
                 }
                 else
                 {
-                    uID += 1000000.ToString();
+                    uID += 0000001.ToString("D7");
                 }
 
                 switch (role)

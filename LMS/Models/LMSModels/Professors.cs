@@ -13,7 +13,7 @@ namespace LMS.Models.LMSModels
         public string UId { get; set; }
         public string FName { get; set; }
         public string LName { get; set; }
-        public DateTime? Dob { get; set; }
+        public DateTime Dob { get; set; }
         public string WorksIn { get; set; }
 
         public virtual Departments WorksInNavigation { get; set; }

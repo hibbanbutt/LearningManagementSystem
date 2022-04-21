@@ -12,9 +12,6 @@ namespace LMS.Controllers
   {
 
     /*******Begin code to modify********/
-
-    // TODO: Uncomment and change 'X' after you have scaffoled
-    
     protected Team103LMSContext db;
 
      public CommonController()
@@ -28,9 +25,6 @@ namespace LMS.Controllers
      *          The "right" way is through Dependency Injection via the constructor 
      *          (look this up if interested).
     */
-
-    // TODO: Uncomment and change 'X' after you have scaffoled
-    
     public void UseLMSContext(Team103LMSContext ctx)
     {
       db = ctx;
@@ -56,7 +50,6 @@ namespace LMS.Controllers
     /// <returns>The JSON array</returns>
     public IActionResult GetDepartments()
     {
-      // TODO: Do not return this hard-coded array.
       using (db)
       {
         var query =
@@ -68,7 +61,6 @@ namespace LMS.Controllers
         
         return Json(query.ToArray());
       }
-      //return Json(new[] { new { name = "None", subject = "NONE" } });
     }
 
 
@@ -86,8 +78,16 @@ namespace LMS.Controllers
     /// <returns>The JSON array</returns>
     public IActionResult GetCatalog()
     {     
-
-      return Json(null);
+      using (db)
+      {
+        // var query =
+        //   from d in db.Departments
+        //   select new{dname = d.Name, courses = from c in db.Courses where d.Subject == c.Subject select new [] {new{number = Number, cname = c.Name}}};
+        
+        
+        
+        return Json(new{success=false});
+      }
     }
 
     /// <summary>
@@ -106,8 +106,15 @@ namespace LMS.Controllers
     /// <returns>The JSON array</returns>
     public IActionResult GetClassOfferings(string subject, int number)
     {
+      var query =
+        from crs in db.Courses
+        join cls in db.Classes on crs.CatalogId equals cls.Listing into offerings
+        from o in offerings
+        join p in db.Professors on o.TaughtBy equals p.UId
+        where (crs.Department == subject && crs.Number == number)
+        select new {season = o.Season, year=o.Year, location=o.Location, start=o.StartTime, end=o.EndTime, fname=p.FName, lname=p.LName};
       
-      return Json(null);
+      return Json(query.ToArray());
     }
 
     /// <summary>

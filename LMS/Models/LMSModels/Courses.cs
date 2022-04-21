@@ -10,12 +10,12 @@ namespace LMS.Models.LMSModels
             Classes = new HashSet<Classes>();
         }
 
+        public uint CatalogId { get; set; }
+        public uint Number { get; set; }
         public string Name { get; set; }
-        public int? Number { get; set; }
-        public string Subject { get; set; }
-        public int CourseId { get; set; }
+        public string Department { get; set; }
 
-        public virtual Departments SubjectNavigation { get; set; }
+        public virtual Departments DepartmentNavigation { get; set; }
         public virtual ICollection<Classes> Classes { get; set; }
     }
 }

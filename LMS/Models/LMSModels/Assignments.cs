@@ -10,14 +10,14 @@ namespace LMS.Models.LMSModels
             Submissions = new HashSet<Submissions>();
         }
 
+        public uint AssignmentId { get; set; }
         public string Name { get; set; }
-        public int CategoryId { get; set; }
-        public int? Points { get; set; }
         public string Contents { get; set; }
-        public DateTime? Due { get; set; }
-        public int AssignId { get; set; }
+        public DateTime Due { get; set; }
+        public uint MaxPoints { get; set; }
+        public uint Category { get; set; }
 
-        public virtual AssignmentCategories Category { get; set; }
+        public virtual AssignmentCategories CategoryNavigation { get; set; }
         public virtual ICollection<Submissions> Submissions { get; set; }
     }
 }

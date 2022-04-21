@@ -10,12 +10,12 @@ namespace LMS.Models.LMSModels
             Assignments = new HashSet<Assignments>();
         }
 
-        public int CategoryId { get; set; }
+        public uint CategoryId { get; set; }
         public string Name { get; set; }
-        public int? Weight { get; set; }
-        public int ClassId { get; set; }
+        public uint Weight { get; set; }
+        public uint InClass { get; set; }
 
-        public virtual Classes Class { get; set; }
+        public virtual Classes InClassNavigation { get; set; }
         public virtual ICollection<Assignments> Assignments { get; set; }
     }
 }
