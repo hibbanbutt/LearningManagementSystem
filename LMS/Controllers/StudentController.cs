@@ -112,36 +112,26 @@ namespace LMS.Controllers
         public IActionResult GetAssignmentsInClass(string subject, int num, string season, int year, string uid)
         {
             using (var db = new Team103LMSContext())
-            {
-                var innerQuery = from e in db.Enrolled
-                            where e.Student == uid
-                            join c in db.Classes
-                            on e.Class equals c.ClassId
+            { 
+                var query = from c in db.Classes
                             where c.Season == season && c.Year == year
                             join course in db.Courses
                             on c.Listing equals course.CatalogId
                             where course.Department == subject && course.Number == num
-                            select c.ClassId;
-
-                var outerQuery = from cat in db.AssignmentCategories
-                            where cat.InClass == innerQuery.First()
+                            join cat in db.AssignmentCategories
+                            on c.ClassId equals cat.InClass
                             join a in db.Assignments
                             on cat.CategoryId equals a.Category
                             join s in db.Submissions
                             on a.AssignmentId equals s.Assignment
-                                 select new
-                                 {
-                                     aname = a.Name,
-                                     cname = cat.Name,
-                                     due = a.Due,
-                                     score = s.Score,
-                                 };
-
-                foreach (var x in outerQuery)
-                {
-                    Debug.WriteLine(x.aname, x.cname, x.due, x.score);
-                }
-                return Json(outerQuery.ToArray());
+                            select new
+                            {
+                                aname = a.Name,
+                                cname = cat.Name,
+                                due = a.Due,
+                                submissions = s.Score,
+                            };
+                return Json(query.ToArray());
             }
         }
     
@@ -262,6 +252,7 @@ namespace LMS.Controllers
             var query = from e in db.Enrolled
                              where e.Student == uid
                              select e;
+
             double GPA = 0.0;
             double count = 0;
 
@@ -308,7 +299,8 @@ namespace LMS.Controllers
                     }
                 }
             }
-            GPA = GPA / count;
+            if (count > 0)
+                GPA = GPA / count;
             return Json(new { gpa = GPA });
     }
 

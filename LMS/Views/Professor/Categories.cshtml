@@ -203,7 +203,7 @@
           season: '@ViewData["season"]',
           year: Number('@ViewData["year"]')},
         success: function (data, status) {
-          //alert(JSON.stringify(data));
+          alert(JSON.stringify(data));
           PopulateTable(tbl, data);
         },
           error: function (ex) {
