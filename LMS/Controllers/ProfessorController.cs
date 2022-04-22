@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using LMS.Models.LMSModels;
 
 namespace LMS.Controllers
 {
@@ -245,10 +246,24 @@ namespace LMS.Controllers
     /// <param name="uid">The professor's uid</param>
     /// <returns>The JSON array</returns>
     public IActionResult GetMyClasses(string uid)
-    {     
-
-      return Json(null);
-    }
+    {
+            using (var db = new Team103LMSContext())
+            {
+                var query = from c in db.Classes
+                            where c.TaughtBy == uid
+                            join course in db.Courses
+                            on c.Listing equals course.CatalogId
+                            select new
+                            {
+                                subject = course.Department,
+                                number = course.Number,
+                                name = course.Name,
+                                season = c.Season,
+                                year = c.Year,
+                            };
+                return Json(query.ToArray());
+            }
+        }
 
 
     /*******End code to modify********/
