@@ -189,9 +189,16 @@ namespace LMS.Controllers
                     join s in db.Submissions
                         on a.AssignmentId equals s.Assignment
                     where s.Student == uid
-                    select s.SubmissionContents;
-
-                return Content(query.First());
+                    select s;
+                if (!query.Any())
+                {
+                    return Content("");
+                }
+                else
+                {
+                    return Content(query.First().SubmissionContents);
+                }
+                
             }
         }
 

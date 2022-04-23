@@ -244,6 +244,8 @@ namespace LMS.Controllers
     ///	false if an assignment category with the same name already exists in the same class.</returns>
     public IActionResult CreateAssignmentCategory(string subject, int num, string season, int year, string category, int catweight)
     {
+            //call helper method to update grades for all students in class 
+
             using (var db = new Team103LMSContext())
             {
                 var query = from c in db.Classes
@@ -382,7 +384,7 @@ namespace LMS.Controllers
     /// <param name="score">The new score for the submission</param>
     /// <returns>A JSON object containing success = true/false</returns>
     public IActionResult GradeSubmission(string subject, int num, string season, int year, string category, string asgname, string uid, int score)
-    {
+    { 
 
             using (var db = new Team103LMSContext())
             {
@@ -412,7 +414,7 @@ namespace LMS.Controllers
                 {
                     return Json(new { success = false });
                 }
-
+                CalculateStudentGrade();
                 return Json(new { success = true });
             }
         
@@ -451,7 +453,118 @@ namespace LMS.Controllers
         }
 
 
-    /*******End code to modify********/
+        /*******End code to modify********/
 
-  }
+        #region Helpers
+        private string CalculateStudentGrade(string subject, int num, string season, int year, string category, string asgname, string uid, int score)
+    {
+        {
+                using (var db = new Team103LMSContext())
+                {
+                    var query = from c in db.Classes
+                                where c.Season == season && c.Year == year
+                                join course in db.Courses
+                                on c.Listing equals course.CatalogId
+                                where course.Department == subject && course.Number == num
+                                join cat in db.AssignmentCategories
+                                on c.ClassId equals cat.InClass
+                                select cat;
+                    double classPercent = 0.0;
+                    double weightSum = 0;
+                    foreach (var ac in query.ToArray())
+                    {
+                        var innerquery = from a in db.AssignmentCategories
+                                         where ac.CategoryId == a.Category
+                                         join assign in db.Assignments
+                                         on a.CategoryID equals assign.Category
+                                         select assign;
+                        int maxCategoryPoints = 0;
+                        int totalEarned = 0;
+                        if (innerquery.Any())
+                        {
+                            foreach (var task in innerquery)
+                            {
+                                maxCategoryPoints += task.MaxPoints;
+                                int maxSubmit = 0;
+                                foreach (var submit in task.Submissions)
+                                {
+                                    if (submit.uID == uid)
+                                    {
+                                        if (submit.Score > maxSubmit)
+                                        {
+                                            maxSubmit = submit.Score;
+                                        }
+                                    }
+                                }
+                                totalEarned += maxSubmit;
+                            }
+                        }
+                        double categoryPercent = totalEarned / maxCategoryPoints;
+                        categoryPercent *= ac.Weight;
+                        classPercent += categoryPercent;
+                        weightSum += ac.Weight;
+                    }
+                    double scaleFactor = 100 / weightSum;
+                    double grade = classPercent * scaleFactor;
+                    string letterGrade;
+
+                    if (grade >= 93.0)
+                    {
+                        letterGrade = "A";
+                    }
+                    else if (grade >= 90.0)
+                    {
+                        letterGrade = "A-";
+                    }
+                    else if (grade >= 87.0)
+                    {
+                        letterGrade = "B+";
+                    }
+                    else if (grade >= 83.0)
+                    {
+                        letterGrade = "B";
+                    }
+                    else if (grade >= 80.0)
+                    {
+                        letterGrade = "B-";
+                    }
+                    else if (grade >= 77.0)
+                    {
+                        letterGrade = "C+";
+                    }
+                    else if (grade >= 73.0)
+                    {
+                        letterGrade = "C";
+                    }
+                    else if (grade >= 70.0)
+                    {
+                        letterGrade = "C-";
+                    }
+                    else if (grade >= 67.0)
+                    {
+                        letterGrade = "D+";
+                    }
+                    else if (grade >= 63.0)
+                    {
+                        letterGrade = "D";
+                    }
+                    else if (grade >= 60.0)
+                    {
+                        letterGrade = "D-";
+                    }
+                    else
+                    {
+                        letterGrade = "E";
+                    }
+
+
+                }       
+    
+
+
+            }
+        }
+
+        #endregion
+    }
 }
