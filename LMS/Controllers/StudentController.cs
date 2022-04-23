@@ -1,12 +1,11 @@
-﻿using System;
+﻿using LMS.Models.LMSModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using LMS.Models.LMSModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace LMS.Controllers
 {
@@ -112,25 +111,32 @@ namespace LMS.Controllers
         public IActionResult GetAssignmentsInClass(string subject, int num, string season, int year, string uid)
         {
             using (var db = new Team103LMSContext())
-            { 
-                var query = from c in db.Classes
-                            where c.Season == season && c.Year == year
-                            join course in db.Courses
-                            on c.Listing equals course.CatalogId
+            {
+                var query = from course in db.Courses
                             where course.Department == subject && course.Number == num
+                            join c in db.Classes
+                            on course.CatalogId equals c.Listing
+                            where c.Season == season && c.Year == year
+                            join e in db.Enrolled
+                            on c.ClassId equals e.Class
+                            where e.Student == uid
                             join cat in db.AssignmentCategories
                             on c.ClassId equals cat.InClass
                             join a in db.Assignments
                             on cat.CategoryId equals a.Category
-                            join s in db.Submissions
-                            on a.AssignmentId equals s.Assignment
                             select new
                             {
                                 aname = a.Name,
                                 cname = cat.Name,
                                 due = a.Due,
-                                submissions = s.Score,
+                                score = !(from s in db.Submissions
+                                          where s.Assignment == a.AssignmentId  && s.Student == uid
+                                          select s.Score).Any() ? null : (uint?)(from s in db.Submissions
+                                                                                 where s.Assignment == a.AssignmentId && s.Student == uid
+                                                                                 select s.Score).First()
                             };
+
+                
                 return Json(query.ToArray());
             }
         }

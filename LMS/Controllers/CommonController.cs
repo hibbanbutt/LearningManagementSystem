@@ -141,7 +141,7 @@ namespace LMS.Controllers
                 var query = from crs in db.Courses
                     where crs.Department == subject && crs.Number == num
                     join cls in db.Classes
-                        on crs.CatalogId equals cls.ClassId
+                        on crs.CatalogId equals cls.Listing
                     where cls.Season == season && cls.Year == year
                     join ac in db.AssignmentCategories
                         on cls.ClassId equals ac.InClass
@@ -178,7 +178,7 @@ namespace LMS.Controllers
                 var query = from crs in db.Courses
                     where crs.Department == subject && crs.Number == num
                     join cls in db.Classes
-                        on crs.CatalogId equals cls.ClassId
+                        on crs.CatalogId equals cls.Listing
                     where cls.Season == season && cls.Year == year
                     join ac in db.AssignmentCategories
                         on cls.ClassId equals ac.InClass

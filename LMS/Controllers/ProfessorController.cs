@@ -175,18 +175,17 @@ namespace LMS.Controllers
                 }
                 else
                 {
-                    var query = from c in db.Classes
+                    var query = from a in db.Assignments
+                                join cat in db.AssignmentCategories
+                                on a.Category equals cat.CategoryId
+                                where cat.Name == category
+                                join c in db.Classes
+                                on cat.InClass equals c.ClassId
                                 where c.Season == season && c.Year == year
                                 join course in db.Courses
                                 on c.Listing equals course.CatalogId
                                 where course.Department == subject && course.Number == num
-                                join cat in db.AssignmentCategories
-                                on c.ClassId equals cat.InClass
-                                where cat.Name == category
-                                join a in db.Assignments
-                                on cat.CategoryId equals a.Category
-                                select new
-                                {
+                                select new {
                                     aname = a.Name,
                                     cname = cat.Name,
                                     due = a.Due,
@@ -297,6 +296,7 @@ namespace LMS.Controllers
                             where course.Department == subject && course.Number == num
                             join cat in db.AssignmentCategories
                             on c.ClassId equals cat.InClass
+                            where cat.Name == category
                             select cat.CategoryId;
 
                 Assignments newAssign = new Assignments();
