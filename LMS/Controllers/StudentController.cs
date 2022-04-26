@@ -6,6 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using Microsoft.EntityFrameworkCore.Scaffolding.Internal;
+using Remotion.Linq.Parsing.Structure.IntermediateModel;
 
 namespace LMS.Controllers
 {
@@ -69,7 +72,7 @@ namespace LMS.Controllers
         /// <returns>The JSON array</returns>
         public IActionResult GetMyClasses(string uid)
         {
-            using (var db = new Team103LMSContext())
+            using (db = new Team103LMSContext())
             {
                 var query = from e in db.Enrolled
                             where e.Student == uid
@@ -165,29 +168,45 @@ namespace LMS.Controllers
     public IActionResult SubmitAssignmentText(string subject, int num, string season, int year, 
       string category, string asgname, string uid, string contents)
     {
-            using (var db = new Team103LMSContext())
+            using (db)
             {
-                var query = from e in db.Enrolled
-                                 where e.Student == uid
-                                 join c in db.Classes
-                                 on e.Class equals c.ClassId
-                                 where c.Season == season && c.Year == year
-                                 join course in db.Courses
-                                 on c.Listing equals course.CatalogId
-                                 where course.Department == subject && course.Number == num
-                                 join cat in db.AssignmentCategories
-                                 on c.ClassId equals cat.InClass
-                                 join a in db.Assignments
-                                 on cat.CategoryId equals a.Category
-                                 select a.AssignmentId;
+                var submissions = from cat in db.AssignmentCategories
+                    where cat.Name == category
+                    join a in db.Assignments
+                        on cat.CategoryId equals a.Category
+                    where a.Name == asgname
+                    join s in db.Submissions
+                        on a.AssignmentId equals s.Assignment
+                    where s.Student == uid
+                    select s;
 
-                Submissions newSubmit = new Submissions();
-                newSubmit.SubmissionContents = contents;
-                newSubmit.Student = uid;
-                newSubmit.Assignment = query.FirstOrDefault();
-                newSubmit.Time = DateTime.Now;
+                var assignment = from cat in db.AssignmentCategories
+                    where cat.Name == category
+                    join a in db.Assignments on cat.CategoryId equals a.Category
+                    where a.Name == asgname
+                    select a.AssignmentId;
 
-                db.Submissions.Add(newSubmit);
+                if (submissions.Any())
+                {
+                    var oldSubmit = submissions.FirstOrDefault();
+                    oldSubmit.SubmissionContents = contents;
+                    oldSubmit.Student = uid;
+                    oldSubmit.Assignment = oldSubmit.Assignment;
+                    oldSubmit.Time = DateTime.Now;
+                    oldSubmit.Score = 0;
+                }
+                else
+                {
+                    Submissions newSubmit = new Submissions();
+                    newSubmit.SubmissionContents = contents;
+                    newSubmit.Student = uid;
+                    newSubmit.Assignment = assignment.First();
+                    newSubmit.Time = DateTime.Now;
+                    newSubmit.Score = 0;
+
+                    db.Submissions.Add(newSubmit);
+                }
+
 
                 try
                 { db.SaveChanges(); }
@@ -213,7 +232,7 @@ namespace LMS.Controllers
 	/// false if the student is already enrolled in the Class.</returns>
     public IActionResult Enroll(string subject, int num, string season, int year, string uid)
     {
-            using (var db = new Team103LMSContext())
+            using (db)
             {
                 var query = from c in db.Classes
                             where c.Season == season && c.Year == year
@@ -266,47 +285,51 @@ namespace LMS.Controllers
             {
                 if (c.Grade != "--")
                 {
-                    count++;
+                    count += 4;
                     switch (c.Grade)
                     {
                         case "A":
-                            GPA += 4.0;
+                            GPA += 4.0 * 4;
                             break;
                         case "A-":
-                            GPA += 3.7;
+                            GPA += 3.7 * 4;
                             break;
                         case "B+":
-                            GPA += 3.3;
+                            GPA += 3.3 * 4;
                             break;
                         case "B":
-                            GPA += 3.0;
+                            GPA += 3.0 * 4;
                             break;
                         case "B-":
-                            GPA += 2.7;
+                            GPA += 2.7 * 4;
                             break;
                         case "C+":
-                            GPA += 2.3;
+                            GPA += 2.3 * 4;
                             break;
                         case "C":
-                            GPA += 2.0;
+                            GPA += 2.0 * 4;
                             break;
                         case "C-":
-                            GPA += 1.7;
+                            GPA += 1.7 * 4;
                             break;
                         case "D+":
-                            GPA += 1.3;
+                            GPA += 1.3 * 4;
                             break;
                         case "D":
-                            GPA += 1.0;
+                            GPA += 1.0 * 4;
                             break;
                         case "D-":
-                            GPA += 0.7;
+                            GPA += 0.7 * 4;
                             break;
                     }
                 }
             }
+
             if (count > 0)
                 GPA = GPA / count;
+            else
+                GPA = 0.0;
+            
             return Json(new { gpa = GPA });
     }
 

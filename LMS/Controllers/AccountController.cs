@@ -520,12 +520,12 @@ namespace LMS.Controllers
                 var professorQuery = from p in db.Professors orderby p.UId descending select p.UId;
 
                 List<long> greatestUids = new List<long>();
-                
-                if(adminQuery.Any())
+
+                if (adminQuery.Any())
                     greatestUids.Add(long.Parse(adminQuery.ToList()[0].Substring(1)));
-                if(studentQuery.Any())
+                if (studentQuery.Any())
                     greatestUids.Add(long.Parse(studentQuery.ToList()[0].Substring(1)));
-                if(professorQuery.Any())
+                if (professorQuery.Any())
                     greatestUids.Add(long.Parse(professorQuery.ToList()[0].Substring(1)));
 
                 if (greatestUids.Count > 0)
@@ -574,9 +574,9 @@ namespace LMS.Controllers
                     default:
                         break;
                 }
-                
-                 try
-                 {
+
+                try
+                {
                     db.SaveChanges();
                 }
                 catch (DbUpdateException e)
