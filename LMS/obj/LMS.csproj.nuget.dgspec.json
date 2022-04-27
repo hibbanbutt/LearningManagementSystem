@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\hibba\\Documents\\LMS_Phase_3\\LMS\\LMS.csproj": {}
+    "C:\\Users\\Camille\\source\\repos\\LearningManagementSystem\\LMS\\LMS.csproj": {}
   },
   "projects": {
-    "C:\\Users\\hibba\\Documents\\LMS_Phase_3\\LMS\\LMS.csproj": {
+    "C:\\Users\\Camille\\source\\repos\\LearningManagementSystem\\LMS\\LMS.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\hibba\\Documents\\LMS_Phase_3\\LMS\\LMS.csproj",
+        "projectUniqueName": "C:\\Users\\Camille\\source\\repos\\LearningManagementSystem\\LMS\\LMS.csproj",
         "projectName": "LMS",
-        "projectPath": "C:\\Users\\hibba\\Documents\\LMS_Phase_3\\LMS\\LMS.csproj",
-        "packagesPath": "C:\\Users\\hibba\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\hibba\\Documents\\LMS_Phase_3\\LMS\\obj\\",
+        "projectPath": "C:\\Users\\Camille\\source\\repos\\LearningManagementSystem\\LMS\\LMS.csproj",
+        "packagesPath": "C:\\Users\\Camille\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Camille\\source\\repos\\LearningManagementSystem\\LMS\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\hibba\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Camille\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -29,6 +29,7 @@
         },
         "frameworks": {
           "netcoreapp2.2": {
+            "targetAlias": "netcoreapp2.2",
             "projectReferences": {}
           }
         },
@@ -40,6 +41,7 @@
       },
       "frameworks": {
         "netcoreapp2.2": {
+          "targetAlias": "netcoreapp2.2",
           "dependencies": {
             "Microsoft.AspNetCore.App": {
               "suppressParent": "All",
@@ -64,10 +66,16 @@
             }
           },
           "imports": [
-            "net461"
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
           ],
           "assetTargetFallback": true,
-          "warn": true
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.406\\RuntimeIdentifierGraph.json"
         }
       }
     }

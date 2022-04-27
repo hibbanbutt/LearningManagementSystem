@@ -424,11 +424,15 @@ namespace LMS.Controllers
                     where a.Name == asgname
                     join student in db.Students
                         on s.Student equals student.UId
+                        where student.UId == uid
                     select s;
 
-                Submissions x = query.FirstOrDefault();
-                if (x != null) x.Score = (uint) score;
-
+                
+                if (query.Any())
+                {
+                    var x = query.FirstOrDefault();
+                    x.Score = (uint)score;
+                }
                 try
                 {
                     db.SaveChanges();
@@ -508,19 +512,25 @@ namespace LMS.Controllers
                         foreach (var task in innerquery)
                         {
                             maxCategoryPoints += task.MaxPoints;
-                            double maxSubmit = 0;
-                            foreach (var submit in task.Submissions)
-                            {
-                                if (submit.Student != uid) continue;
-                                if (submit.Score > maxSubmit)
-                                {
-                                    maxSubmit = submit.Score;
-                                }
-                
-                                totalEarned += maxSubmit;
-                            }
+                            var submission = from c in db.Classes
+                                        where c.Season == season && c.Year == year
+                                        join course in db.Courses
+                                            on c.Listing equals course.CatalogId
+                                        where course.Department == subject && course.Number == num
+                                        join cat in db.AssignmentCategories
+                                            on c.ClassId equals cat.InClass
+                                        join a in db.Assignments
+                                            on cat.CategoryId equals a.Category
+                                        join s in db.Submissions
+                                            on a.AssignmentId equals s.Assignment
+                                        where a.AssignmentId == task.AssignmentId
+                                        join student in db.Students
+                                            on s.Student equals student.UId
+                                        where student.UId == uid
+                                        select s;
+                            totalEarned = submission.FirstOrDefault().Score;
                         }
-                
+
                         double categoryPercent = totalEarned / maxCategoryPoints;
                         categoryPercent *= ac.Weight;
                         classPercent += categoryPercent;

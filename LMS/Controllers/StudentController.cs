@@ -170,21 +170,34 @@ namespace LMS.Controllers
     {
             using (db)
             {
-                var submissions = from cat in db.AssignmentCategories
-                    where cat.Name == category
-                    join a in db.Assignments
-                        on cat.CategoryId equals a.Category
-                    where a.Name == asgname
-                    join s in db.Submissions
-                        on a.AssignmentId equals s.Assignment
-                    where s.Student == uid
-                    select s;
+                var assignment = from c in db.Classes
+                                 where c.Season == season && c.Year == year
+                                 join course in db.Courses
+                                     on c.Listing equals course.CatalogId
+                                 where course.Department == subject && course.Number == num
+                                 join cat in db.AssignmentCategories
+                                     on c.ClassId equals cat.InClass
+                                 where cat.Name == category
+                                 join a in db.Assignments
+                                 on cat.CategoryId equals a.Category
+                                 where a.Name == asgname
+                                 select a.AssignmentId;
 
-                var assignment = from cat in db.AssignmentCategories
-                    where cat.Name == category
-                    join a in db.Assignments on cat.CategoryId equals a.Category
-                    where a.Name == asgname
-                    select a.AssignmentId;
+                var submissions = from c in db.Classes
+                                      where c.Season == season && c.Year == year
+                                      join course in db.Courses
+                                          on c.Listing equals course.CatalogId
+                                      where course.Department == subject && course.Number == num
+                                      join cat in db.AssignmentCategories
+                                          on c.ClassId equals cat.InClass
+                                      where cat.Name == category
+                                      join a in db.Assignments
+                                      on cat.CategoryId equals a.Category
+                                      where a.Name == asgname
+                                      join s in db.Submissions
+                                          on a.AssignmentId equals s.Assignment
+                                      where s.Student == uid
+                                      select s;
 
                 if (submissions.Any())
                 {
